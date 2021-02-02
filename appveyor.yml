@@ -42,7 +42,7 @@ build_script:
 #---------------------------------#
 
 artifacts:
- - path: '\Appveyor.CI.Test\bin\Release\netcoreapp3.0\publish'
+ - path: '\Appveyor.CI.Test\bin\Any CPU\Release\netcoreapp3.0\publish'
    name: WebsiteSourceCode
    type: WebDeployPackage
   

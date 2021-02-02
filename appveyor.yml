@@ -1,0 +1,64 @@
+#---------------------------------#
+#      general configuration      #
+#---------------------------------#
+
+version: 1.0.{build}-{branch}
+
+branches:
+  only:
+   - master
+ 
+#---------------------------------#
+#    environment configuration    #
+#---------------------------------#
+
+clone_depth: 1
+
+image: Visual Studio 2019
+
+cache:
+  - '%LocalAppData%\NuGet\Cache'    # NuGet < v3
+  - '%LocalAppData%\NuGet\v3-cache' # NuGet v3
+
+init:
+  - cmd: git config --global core.autocrlf true
+  
+#---------------------------------#
+#       build configuration       #
+#---------------------------------#
+
+platform: Any CPU
+
+configuration: Release
+  
+before_build:
+  - cmd: dotnet --version
+  - cmd: dotnet restore ./Appveyor.CI.Test/Appveyor.CI.Test.csproj --verbosity m
+build_script:
+  - cmd: dotnet publish ./Appveyor.CI.Test/Appveyor.CI.Test.csproj
+       
+#---------------------------------#
+#      artifacts configuration    #
+#---------------------------------#
+
+artifacts:
+ - path: '\Appveyor.CI.Test\bin\Any CPU\Release\netcoreapp3.0\publish'
+   name: WebsiteSourceCode
+   type: WebDeployPackage
+  
+#---------------------------------#
+#     deployment configuration    #
+#---------------------------------#
+
+deploy:
+- provider: WebDeploy
+  server: https://obruin.scm.azurewebsites.net/msdeploy.axd?site=obruin
+  website: obruin
+  username: $obruin
+  password:
+    secure: EVbjnLNMmwknqr0rCCEQgUg8jKiDvNdHez/DwUgAuWG6BJ4i2V++r1ptD6DV5Lc38NiyKbTQav+CU4dHoTPNyw==
+  artifact: WebsiteSourceCode
+  aspnet_core: true
+  app_offline: true
+  do_not_use_checksum: true
+  aspnet_core_force_restart: true
